@@ -1,0 +1,29 @@
+name: Extract Android Project
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract project
+        run: |
+          rm -rf project
+          mkdir project
+          unzip -q TehMORA_Stok_Android_V1.zip -d project
+
+      - name: Commit extracted source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add project
+          git diff --cached --quiet || git commit -m "Extract Android project source"
+          git push
