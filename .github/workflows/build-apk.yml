@@ -1,0 +1,49 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'TehMORA_Stok_Android_V1.zip'
+      - '.github/workflows/build-apk.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ambil repository
+        uses: actions/checkout@v4
+
+      - name: Siapkan Android
+        uses: android-actions/setup-android@v3
+
+      - name: Siapkan Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Siapkan Android SDK
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Buka project
+        run: |
+          mkdir project
+          unzip -q TehMORA_Stok_Android_V1.zip -d project
+
+      - name: Build APK
+        run: |
+          cd project
+          gradle assembleDebug
+
+      - name: Salin APK
+        run: |
+          cp project/app/build/outputs/apk/debug/app-debug.apk TehMORA-Stok.apk
+
+      - name: Simpan APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TehMORA-Stok
+          path: TehMORA-Stok.apk
